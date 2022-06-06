@@ -2,17 +2,29 @@
 import sys
 import os
 import shutil
-
-
-# clone the repot to be scannned by cloc tool.
-gitrep = sys.argv[1]
+import subprocess
+import smtplib
 tmp = "temp-cloc-repot"
-clone = "git clone --depth 1 "+ gitrep+ tmp 
-os.system(clone) # Cloning
-
-# lunch cloc
 cloc = "cloc " + tmp
-os.system(cloc)
+isExist = os.path.isdir(tmp)
 
-#remove tmp
-shutil.rmtree(tmp)
+#check if the temp repot file exist
+if isExist:
+    #os.system(cloc)
+    result = subprocess.check_output(cloc)
+    print(result)
+
+else:
+    # clone the repot to be scannned by cloc tool.
+    gitrep = sys.argv[1]
+    clone = "git clone --depth 1 "+ gitrep+ " " +  tmp 
+    os.system(clone)
+    
+    # lunch cloc
+    #os.system(cloc)
+    result = subprocess.check_output(cloc)
+    print(result)
+
+#send result to  email
+s=smtplib.SMTP('localhost')
+s.sendmail("halidsanfo@gmail.com", "halidsanfo@gmail.com", "the cloc scan result : "+result)
